@@ -1,5 +1,8 @@
-const API_BASE_URL =
-  "https://python-basic-learning-project-chatbot-ai.onrender.com/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "");
+
+if (!API_BASE_URL) {
+  throw new Error("VITE_API_BASE_URL is not configured.");
+}
 
 async function postJSON(path, body) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
