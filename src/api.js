@@ -1,11 +1,13 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "");
+const RAG_API_BASE_URL =
+  "https://python-basic-learning-project-chatbot-ai.onrender.com/api/v1";
 
 if (!API_BASE_URL) {
   throw new Error("VITE_API_BASE_URL is not configured.");
 }
 
-async function postJSON(path, body) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+async function postJSON(path, body, baseUrl = API_BASE_URL) {
+  const response = await fetch(`${baseUrl}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -42,4 +44,12 @@ export function loginAccount({ email, password }) {
 
 export function sendChatMessage(message) {
   return postJSON("/gemini/chat", { message });
+}
+
+export function askEducationQuestion(question) {
+  return postJSON(
+    "/rag/ask-with-fallback",
+    { question },
+    RAG_API_BASE_URL,
+  );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Brand from "./Brand.jsx";
+import QuestionStudio from "./QuestionStudio.jsx";
 import { sendChatMessage } from "../api.js";
 
 const suggestions = [
@@ -68,6 +69,7 @@ export default function ChatPage({ user }) {
   const [searchEnabled, setSearchEnabled] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState("");
+  const [activeView, setActiveView] = useState("chat");
   const textareaRef = useRef(null);
   const chatScrollArea = useRef(null);
   const toastTimer = useRef(null);
@@ -106,6 +108,7 @@ export default function ChatPage({ user }) {
 
   function startNewChat() {
     requestId.current += 1;
+    setActiveView("chat");
     setMessages([]);
     setIsResponding(false);
     setCurrentChatTitle("New chat");
@@ -120,6 +123,7 @@ export default function ChatPage({ user }) {
 
   function selectHistory(title) {
     requestId.current += 1;
+    setActiveView("chat");
     setActiveHistory(title);
     setCurrentChatTitle(title);
     setMessages([]);
@@ -229,6 +233,33 @@ export default function ChatPage({ user }) {
           <span>New chat</span>
           <kbd>⌘ K</kbd>
         </button>
+
+        <div className="workspace-nav" aria-label="Workspace">
+          <p className="sidebar-label">YOUR WORKSPACE</p>
+          <button
+            className={`workspace-link${activeView === "chat" ? " active" : ""}`}
+            aria-current={activeView === "chat" ? "page" : undefined}
+            onClick={() => {
+              setActiveView("chat");
+              setSidebarOpen(false);
+            }}
+          >
+            <span className="workspace-link-icon">✦</span>
+            <span>AI chat</span>
+          </button>
+          <button
+            className={`workspace-link${activeView === "questions" ? " active" : ""}`}
+            aria-current={activeView === "questions" ? "page" : undefined}
+            onClick={() => {
+              setActiveView("questions");
+              setSidebarOpen(false);
+            }}
+          >
+            <span className="workspace-link-icon question-link-icon">Q</span>
+            <span>Question studio</span>
+            <span className="workspace-link-badge">NEW</span>
+          </button>
+        </div>
 
         <div className="history-section">
           <p className="sidebar-label">RECENT</p>
@@ -353,6 +384,10 @@ export default function ChatPage({ user }) {
           </div>
         </header>
 
+        {activeView === "questions" ? (
+          <QuestionStudio />
+        ) : (
+          <>
         <div className="chat-scroll-area" ref={chatScrollArea}>
           {messages.length === 0 ? (
             <div className="welcome-content">
@@ -498,6 +533,8 @@ export default function ChatPage({ user }) {
             .
           </p>
         </div>
+          </>
+        )}
       </div>
       <div className={`toast${toast ? " visible" : ""}`} role="status" aria-live="polite">
         {toast}
